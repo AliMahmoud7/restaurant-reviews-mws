@@ -217,8 +217,8 @@ nav h1 a {
   background-color: #ccc;
   display: block;
   max-width: 100%;
-  /*min-height: 248px;*/
-  max-height: 248px;
+  min-height: 248px;
+  max-height: 300px;
   min-width: 100%;
   margin: 20px 0 0;
 }
