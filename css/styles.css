@@ -237,6 +237,10 @@ nav h1 a {
   text-decoration: none;
   text-transform: uppercase;
 }
+#restaurants-list li a:hover,
+#restaurants-list li a:focus {
+  background-color: #a56d05;
+}
 
 /* ====================== Restaurant Details ====================== */
 
