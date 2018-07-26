@@ -7,7 +7,7 @@ td,
 th,
 p {
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 10pt;
+  font-size: 11pt;
   color: #333;
   line-height: 1.5;
 }
@@ -67,6 +67,20 @@ section {
 	display: block;
 }
 
+.skip-link {
+  position: absolute;
+  top: -200px;
+  left: 0;
+  z-index: 1002;
+  padding: 5px;
+  color: #fff !important;
+  background-color: #8c2727;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
 #maincontent {
   background-color: #f3f3f3;
   min-height: 100%;
@@ -107,7 +121,6 @@ nav h1 a {
   padding: 10px 40px 16px;
   list-style: none;
   background-color: #eee;
-  font-size: 17px;
   margin: 0;
   /*width: calc(50% - 80px);*/
   width: 100%;
@@ -115,7 +128,8 @@ nav h1 a {
 
 /* Display list items side by side */
 #breadcrumb li {
-    display: inline;
+  display: inline;
+  font-size: 17px;
 }
 
 /* Add a slash symbol (/) before/behind each list item */
@@ -257,7 +271,7 @@ nav h1 a {
   /*position: fixed;*/
   /*right: 0;*/
   /*top: 80px;*/
-  margin-top: 127px;
+  margin-top: 131px;
   height: 400px;
   width: 100%;
 }
@@ -355,28 +369,32 @@ nav h1 a {
 
 #restaurant-hours td {
   color: #666;
+  padding: 4px;
+  font-size: 11pt;
 }
 
 .name-date-container {
   background-color: #333;
   margin-left: -20px;
   margin-right: -20px;
-  padding: 10px 25px;
+  padding: 8px 25px;
+}
+
+.review-name,
+.review-date {
+  display: inline-block;
+  font-size: 16px;
 }
 
 .review-name {
   color: #fff;
   width: 30%;
-  display: inline-block;
-  font-size: 15px;
 }
 
 .review-date {
   color: #ccc;
   width: 70%;
-  display: inline-block;
   text-align: right;
-  font-size: 15px;
 }
 
 .rating {
@@ -402,6 +420,10 @@ nav h1 a {
   nav h1 a {
     font-size: 22px;
   }
+
+  .inside #map-container {
+    margin-top: 128px;
+  }
 }
 
 /* Small devices */
@@ -416,10 +438,6 @@ nav h1 a {
     margin-right: 0;
   }
 
-  .inside #map-container {
-    margin-top: 121px;
-  }
-
   #reviews-list li,
   #restaurant-img,
   #restaurant-cuisine {
@@ -432,6 +450,10 @@ nav h1 a {
   nav h1 a {
     font-size: 16px;
     letter-spacing: 6px;
+  }
+
+  .inside #map-container {
+    margin-top: 127px;
   }
 
   #restaurants-list li,
@@ -449,12 +471,22 @@ nav h1 a {
     font-size: 26px;
   }
 
+  #breadcrumb li {
+    font-size: 16px;
+  }
+
   .review-name,
   .review-date {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .name-date-container {
-    padding: 10px 20px;
+    padding: 6px 20px;
+  }
+}
+
+@media (max-width: 340px) {
+  nav h1 a {
+    letter-spacing: 4px;
   }
 }
