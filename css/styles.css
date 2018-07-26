@@ -152,6 +152,17 @@ nav h1 a {
 }
 
 /* ====================== Map ====================== */
+#map-container {
+  margin-top: 80px;
+}
+
+.inside #map-container {
+  background: blue none repeat scroll 0 0;
+  /*position: fixed;*/
+  /*right: 0;*/
+  /*top: 80px;*/
+  margin-top: 131px;
+}
 
 #map {
   height: 400px;
@@ -258,28 +269,13 @@ nav h1 a {
 
 /* ====================== Restaurant Details ====================== */
 
+header,
 .inside header {
   position: fixed;
   top: 0;
   width: 100%;
   max-width: 1170px;
   z-index: 1001;
-}
-
-.inside #map-container {
-  background: blue none repeat scroll 0 0;
-  /*position: fixed;*/
-  /*right: 0;*/
-  /*top: 80px;*/
-  margin-top: 131px;
-  height: 400px;
-  width: 100%;
-}
-
-.inside #map {
-  background-color: #ccc;
-  height: 100%;
-  width: 100%;
 }
 
 .inside #footer {
@@ -419,6 +415,10 @@ nav h1 a {
 @media (max-width: 991px) {
   nav h1 a {
     font-size: 22px;
+  }
+
+  #map-container {
+    margin-top: 77px;
   }
 
   .inside #map-container {
