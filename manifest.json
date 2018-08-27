@@ -1,12 +1,6 @@
 {
   "name": "Restaurant Reviews",
-  "short_name": "Rest-Rev",
-  "start_url": "/index.html",
-  "dir": "ltr",
-  "lang": "en-US",
-  "background_color": "#fff",
-  "theme_color": "#3397db",
-  "display": "standalone",
+  "short_name": "Reviews",
   "icons": [
     {
       "src": "img/icons/icon-32.png",
@@ -14,14 +8,18 @@
       "sizes": "32x32"
     },
     {
-      "src": "img/icons/icon-128.png",
+      "src": "img/icons/icon-192.png",
       "type": "image/png",
-      "sizes": "128x128"
+      "sizes": "192x192"
     },
     {
       "src": "img/icons/icon-512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
-  ]
+  ],
+  "start_url": "/index.html",
+  "background_color": "#3397db",
+  "display": "standalone",
+  "theme_color": "#3397db"
 }
