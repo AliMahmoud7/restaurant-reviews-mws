@@ -158,15 +158,31 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
 
-  const image = document.createElement('img');
-  image.className = 'restaurant-img';
+  const picture = document.createElement('picture');
+  picture.className = 'restaurant-img';
+  // picture.setAttribute('role', 'img');
   const imgUrl = DBHelper.imageUrlForRestaurant(restaurant);
-  // const imgUrlName = imageUrl.replace(/\.jpg$/, '');
-  const [imgUrlName, imgType] = imgUrl.split('.');
-  image.src = `${imgUrlName}-800_2x.${imgType}`;
+  // const [imgUrlName, imgType] = imgUrl.split('.');
+  const [imgUrlName, imgType] = [imgUrl, 'jpg'];
+  const source1 = document.createElement('source');
+  const source2 = document.createElement('source');
+  const image = document.createElement('img');
+
+  source1.setAttribute('media', '(min-width: 701px)');
+  source1.setAttribute('srcset', `${imgUrlName}-800_2x.${imgType} 2x, ${imgUrlName}-800_1x.${imgType} 1x`);
+
+  source2.setAttribute('media', '(max-width: 700px)');
+  source2.setAttribute('srcset', `${imgUrlName}-400_2x.${imgType} 2x, ${imgUrlName}-400_1x.${imgType} 1x`);
+
+  image.className = 'restaurant-img';
+  image.src = `${imgUrlName}-800_1x.${imgType}`;
   image.setAttribute('srcset', `${imgUrlName}-800_2x.${imgType} 2x, ${imgUrlName}-400_1x.${imgType} 1x`);
   image.alt = `An Image of ${restaurant.name} Restaurant`;
-  li.append(image);
+
+  picture.append(source1);
+  picture.append(source2);
+  picture.append(image);
+  li.append(picture);
 
   const name = document.createElement('h1');
   name.innerHTML = restaurant.name;

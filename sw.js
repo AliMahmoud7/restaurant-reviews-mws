@@ -1,6 +1,6 @@
 let assetsCacheName = 'restaurant-reviews-static-v1';
 
-// Create the cache
+/** Create the cache */
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(assetsCacheName).then(cache => {
@@ -12,25 +12,15 @@ self.addEventListener('install', event => {
         'js/main.js',
         'js/dbhelper.js',
         'js/restaurant_info.js',
-        'data/restaurants.json',
-        'img/1.jpg',
-        'img/2.jpg',
-        'img/3.jpg',
-        'img/4.jpg',
-        'img/5.jpg',
-        'img/6.jpg',
-        'img/7.jpg',
-        'img/8.jpg',
-        'img/9.jpg',
-        'img/10.jpg',
+        'data/restaurants.json'
       ]).catch(err => {
-        console.log('Cache failed!!', err);
+        console.log(`Cache failed! ${err}`);
       });
     })
   );
 });
 
-// Delete old caches for our app when update SW
+/** Delete old caches for our app when update SW */
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -46,7 +36,7 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Intercept requests to return from our cache if there
+/** Intercept requests to return from our cache if there */
 self.addEventListener('fetch', event => {
   // const requestUrl = new URL(event.request.url);
   const requestUrl = event.request.url;
@@ -55,10 +45,15 @@ self.addEventListener('fetch', event => {
     caches.match(event.request).then(response => {
       return response ||
         fetch(event.request).then(networkResponse => {
+          if (!networkResponse || networkResponse.status !== 200 )
+            return networkResponse;
+
           return caches.open(assetsCacheName).then(cache => {
             cache.put(requestUrl, networkResponse.clone());
             return networkResponse;
           });
+        }).catch(err => {
+          console.warn(`Error Fetching item! ${err}`);
         });
     })
   );

@@ -86,13 +86,28 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 
-  const image = document.getElementById('restaurant-img');
-  image.className = 'restaurant-img';
+  const picture = document.getElementById('restaurant-img');
+  picture.className = 'restaurant-img';
   const imgUrl = DBHelper.imageUrlForRestaurant(restaurant);
-  const [imgUrlName, imgType] = imgUrl.split('.');
-  image.src = `${imgUrlName}-800_2x.${imgType}`;
+  const [imgUrlName, imgType] = [imgUrl, 'jpg'];
+  const source1 = document.createElement('source');
+  const source2 = document.createElement('source');
+  const image = document.createElement('img');
+
+  source1.setAttribute('media', '(min-width: 701px)');
+  source1.setAttribute('srcset', `${imgUrlName}-800_2x.${imgType} 2x, ${imgUrlName}-800_1x.${imgType} 1x`);
+
+  source2.setAttribute('media', '(max-width: 700px)');
+  source2.setAttribute('srcset', `${imgUrlName}-400_2x.${imgType} 2x, ${imgUrlName}-400_1x.${imgType} 1x`);
+
+  image.className = 'restaurant-img';
+  image.src = `${imgUrlName}-800_1x.${imgType}`;
   image.setAttribute('srcset', `${imgUrlName}-800_2x.${imgType} 2x, ${imgUrlName}-400_1x.${imgType} 1x`);
   image.alt = `An Image of ${restaurant.name} Restaurant`;
+
+  picture.append(source1);
+  picture.append(source2);
+  picture.append(image);
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
