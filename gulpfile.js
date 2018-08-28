@@ -11,7 +11,7 @@ gulp.task('styles', () => {
   return gulp.src('css/*.css')  // ['css/styles.css' , 'css/responsive.css']
     .pipe(cleanCSS({ level: 2 }))
     .pipe(concat('styles.bundle.min.css'))
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('dist/css'));
 });
 
 gulp.task('scripts:db_helper', () => {
@@ -20,7 +20,7 @@ gulp.task('scripts:db_helper', () => {
     // .pipe(concat('dbhelper.min.js'))
     .pipe(rename('dbhelper.min.js'))
     .pipe(uglify())
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('dist/js'));
 });
 
 // Default task
