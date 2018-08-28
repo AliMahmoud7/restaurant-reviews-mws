@@ -12,30 +12,121 @@ class DBHelper {
     return `http://localhost:${port}/restaurants`;
   }
 
+  /** IndexedDB */
+  static openIndexedDB() {
+    // If the browser doesn't support service worker, we don't care about having indexedDB
+    if (!navigator.serviceWorker) {
+      return Promise.resolve();
+    }
+
+    return idb.open('restaurant-reviews', 1, (upgradeDb) => {
+      switch(upgradeDb.oldVersion) {
+        case 0:
+          let store = upgradeDb.createObjectStore('restaurants', {
+            keyPath: 'id'
+          });
+          store.createIndex('by-date', 'createdAt');
+      }
+    });
+  }
+
+  /** Add new data to an indexedDB store*/
+  static idbAdd(store, data) {
+    return DBHelper.openIndexedDB().then((db) => {
+      if (!db) return Promise.reject("Can't open indexedDB");
+
+      let tx = db.transaction(store, 'readwrite');
+      let keyValStore = tx.objectStore(store);
+      if (data.length === undefined) {
+        keyValStore.put(data);
+      }
+      else {
+        // data.forEach((keyVal) => keyValStore.put(keyVal));
+        data.map((keyVal) => keyValStore.put(keyVal));
+      }
+      return tx.complete;
+    });
+  }
+
+  /** Read a value of a specific key from an indexedDB store*/
+  static idbRead(store, key) {
+    return DBHelper.openIndexedDB().then((db) => {
+      if (!db) return Promise.reject("Can't open indexedDB");
+
+      let tx = db.transaction(store);
+      let keyValStore = tx.objectStore(store);
+      try {
+        const id = parseInt(key);
+        return keyValStore.get(id);
+      } catch (error) {
+        return keyValStore.get(key);
+      }
+    }).then((val) => {
+      if (val) {
+        return Promise.resolve(val);
+      } else {
+        return Promise.reject("Can't find this key!");
+      }
+    });
+  }
+
+  /** Read all data from an indexedDB store */
+  static idbReadAll(store) {
+    return DBHelper.openIndexedDB().then((db) => {
+      if (!db) return Promise.reject("Can't open indexedDB");
+
+      let tx = db.transaction(store);
+      let keyValStore = tx.objectStore(store);
+      return keyValStore.getAll();
+    }).then((data) => {
+      if (data.length) {
+        return Promise.resolve(data);
+      } else {
+        return Promise.reject("Can't find data!");
+      }
+    });
+  }
+
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    fetch(DBHelper.DATABASE_URL).then((response) => {
-      return response.json();
-    }).then((restaurants) => {
-      return callback(null, restaurants);
-    }).catch((error) => {
-      return callback(error, null);
+    // Get data from indexedDB if existed
+    DBHelper.idbReadAll('restaurants').then((restaurants) => {
+      console.log("Fetched all restaurants:", restaurants);
+      callback(null, restaurants);
+    }).catch(error => {
+      console.log(error);
+
+      // Get data from the network if not existed in indexedDB and Update it
+      fetch(DBHelper.DATABASE_URL).then((response) => {
+        return response.json();
+      }).then((restaurants) => {
+        DBHelper.idbAdd('restaurants', restaurants).then((restaurants) => {
+          console.log('Data successfully added');
+        }).catch(error => {
+          console.log(error);
+        });
+        callback(null, restaurants);
+      }).catch((error) => {
+        callback(error, null);
+      });
     });
 
-    // let xhr = new XMLHttpRequest();
-    // xhr.open('GET', DBHelper.DATABASE_URL);
-    // xhr.onload = () => {
-    //   if (xhr.status === 200) { // Got a success response from server!
-    //     const restaurants = JSON.parse(xhr.responseText);
-    //     callback(null, restaurants);
-    //   } else { // Oops!. Got an error from server.
-    //     const error = (`Request failed. Returned status of ${xhr.status}`);
-    //     callback(error, null);
-    //   }
-    // };
-    // xhr.send();
+    /*
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET', DBHelper.DATABASE_URL);
+    xhr.onload = () => {
+      if (xhr.status === 200) { // Got a success response from server!
+        const restaurants = JSON.parse(xhr.responseText);
+        callback(null, restaurants);
+      } else { // Oops!. Got an error from server.
+        const error = (`Request failed. Returned status of ${xhr.status}`);
+        callback(error, null);
+      }
+    };
+    xhr.send();
+    */
   }
 
   /**
@@ -51,10 +142,27 @@ class DBHelper {
         if (restaurant) { // Got the restaurant
           callback(null, restaurant);
         } else { // Restaurant does not exist in the database
-          callback('Restaurant does not exist', null);
+          callback('Restaurant does not exist!', null);
         }
       }
     });
+
+    /*
+     DBHelper.idbRead('restaurants', id).then((restaurant) => {
+     console.log("Fetched restaurant:", restaurant);
+     callback(null, restaurant);
+     }).catch(error => {
+     console.log(error);
+
+     fetch(`${DBHelper.DATABASE_URL}/${id}`).then((response) => {
+     return response.json();
+     }).then((restaurant) => {
+     callback(null, restaurant);
+     }).catch((error) => {
+     callback(error, null);
+     });
+     });
+     */
   }
 
   /**

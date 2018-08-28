@@ -5,17 +5,14 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(assetsCacheName).then(cache => {
       return cache.addAll([
-        '/',
         'index.html',
         'restaurant.html',
-        'dist/bundle.min.css',
+        'dist/styles.bundle.min.css',
         // 'js/dbhelper.js',
+        'dist/dbhelper.min.js',
         'js/main.js',
         'js/restaurant_info.js',
-        'dist/dbhelper.bundle.min.js',
-        // 'dist/main.bundle.min.js',
-        // 'dist/restaurant.bundle.min.js',
-        '/manifest.json'
+        'manifest.json'
       ]).catch(err => {
         console.log(`Cache failed! ${err}`);
       });
