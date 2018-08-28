@@ -9,7 +9,7 @@ class DBHelper {
    */
   static get DATABASE_URL() {
     const port = 1337; // Change this to your server port
-    return `http://localhost:${port}/restaurants`;
+    return `http://localhost:${port}/`;
   }
 
   /** IndexedDB */
@@ -19,13 +19,18 @@ class DBHelper {
       return Promise.resolve();
     }
 
-    return idb.open('restaurant-reviews', 1, (upgradeDb) => {
+    return idb.open('restaurant-reviews', 2, (upgradeDb) => {
       switch(upgradeDb.oldVersion) {
         case 0:
-          let store = upgradeDb.createObjectStore('restaurants', {
+          let restaurantsStore = upgradeDb.createObjectStore('restaurants', {
             keyPath: 'id'
           });
-          store.createIndex('by-date', 'createdAt');
+          restaurantsStore.createIndex('by-date', 'createdAt');
+        case 1:
+          let reviewsStore = upgradeDb.createObjectStore('reviews', {
+            keyPath: 'id'
+          });
+          reviewsStore.createIndex('by-restaurant', 'restaurant_id');
       }
     });
   }
@@ -99,7 +104,7 @@ class DBHelper {
       console.log(error);
 
       // Get data from the network if not existed in indexedDB and Update it
-      fetch(DBHelper.DATABASE_URL).then((response) => {
+      fetch(DBHelper.DATABASE_URL + 'restaurants').then((response) => {
         return response.json();
       }).then((restaurants) => {
         DBHelper.idbAdd('restaurants', restaurants).then((restaurants) => {
@@ -154,7 +159,7 @@ class DBHelper {
      }).catch(error => {
      console.log(error);
 
-     fetch(`${DBHelper.DATABASE_URL}/${id}`).then((response) => {
+     fetch(DBHelper.DATABASE_URL + `restaurants/${id}`).then((response) => {
      return response.json();
      }).then((restaurant) => {
      callback(null, restaurant);
