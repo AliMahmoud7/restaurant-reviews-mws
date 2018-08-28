@@ -8,11 +8,14 @@ self.addEventListener('install', event => {
         '/',
         'index.html',
         'restaurant.html',
-        'css/styles.css',
+        'dist/bundle.min.css',
+        // 'js/dbhelper.js',
         'js/main.js',
-        'js/dbhelper.js',
         'js/restaurant_info.js',
-        'data/restaurants.json'
+        'dist/dbhelper.bundle.min.js',
+        // 'dist/main.bundle.min.js',
+        // 'dist/restaurant.bundle.min.js',
+        '/manifest.json'
       ]).catch(err => {
         console.log(`Cache failed! ${err}`);
       });

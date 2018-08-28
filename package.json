@@ -17,8 +17,20 @@
     "url": "https://github.com/AliMahmoud7/mws-restaurant-stage-1/issues"
   },
   "homepage": "https://github.com/AliMahmoud7/mws-restaurant-stage-1#readme",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
     "grunt": "^1.0.3",
-    "grunt-responsive-images": "^1.10.1"
+    "grunt-responsive-images": "^1.10.1",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.1",
+    "gulp-clean-css": "^3.10.0",
+    "gulp-cli": "^2.0.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-rename": "^1.4.0",
+    "gulp-uglify": "^3.0.1",
+    "optimist": "^0.6.1",
+    "option": "^0.2.4"
   }
 }
