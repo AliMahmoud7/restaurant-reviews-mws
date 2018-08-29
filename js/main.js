@@ -192,29 +192,29 @@ createRestaurantHTML = (restaurant) => {
   const favBtn = document.createElement('button');
   favBtn.innerHTML = '❤';
   favBtn.classList.add("fav-btn");
-  if(restaurant.is_favorite) {
-    favBtn.classList.add('fav-active');
-    favBtn.setAttribute('aria-label', 'Remove as favorite');
-  } else {
-    favBtn.setAttribute('aria-label', 'Mark as favorite');
-  }
+  changeFavBtnActiveClass(restaurant.is_favorite);
 
   favBtn.onclick = (e) => {
     // Toggle button favorite status
     const isFav = !restaurant.is_favorite;
     restaurant.is_favorite = isFav;
-
-    if(isFav) {
-      favBtn.classList.add('fav-active');
-      favBtn.setAttribute('aria-label', 'Remove as favorite');
-    } else {
-      favBtn.classList.remove('fav-active');
-      favBtn.setAttribute('aria-label', 'Mark as favorite');
-    }
+    changeFavBtnActiveClass(isFav);
 
     // Update the server and indexedDB restaurant favorite status
     DBHelper.updateFavoriteStatus(restaurant.id, isFav);
   };
+
+  function changeFavBtnActiveClass(isFavorite) {
+    if(isFavorite === true || isFavorite === 'true') {
+      favBtn.classList.add('fav-active');
+      favBtn.setAttribute('aria-label', 'Remove as favorite');
+      restaurant.is_favorite = true;
+    } else {
+      favBtn.classList.remove('fav-active');
+      favBtn.setAttribute('aria-label', 'Mark as favorite');
+      restaurant.is_favorite = false;
+    }
+  }
   li.append(favBtn);
 
   const neighborhood = document.createElement('p');
