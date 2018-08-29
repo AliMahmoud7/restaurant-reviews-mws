@@ -288,6 +288,41 @@ class DBHelper {
     return (`/img/${restaurant.photograph}`);
   }
 
+  /**
+   * Fetch all reviews.
+   */
+  static fetchReviewsByRestaurantId(id) {
+    return fetch(`${DBHelper.DATABASE_URL}reviews/?restaurant_id=${id}`).then((response) => {
+      return response.json();
+    })
+      .then((reviews) => {
+        DBHelper.idbAdd('reviews', reviews).then(() => {
+          console.log('Data successfully added');
+        }).catch(error => {
+          console.log(error);
+        });
+        console.log('revs are: ', reviews);
+        return Promise.resolve(reviews);
+      })
+      .catch((error) => {
+        // No internet connection
+        return DBHelper.openIndexedDB().then((db) => {
+          if (!db) return Promise.reject("Can't open indexedDB");
+
+          const reviewsStore = db.transaction('reviews').objectStore('reviews');
+          const reviewsIndex = reviewsStore.index('by-restaurant');
+          return reviewsIndex.getAll(parseInt(id));
+        }).then((storedReviews) => {
+          if (storedReviews) {
+            console.log('looking for offline stored reviews');
+            return Promise.resolve(storedReviews);
+          } else {
+            return Promise.reject("Can't find this key!");
+          }
+        });
+      });
+  }
+
   /** Update restaurant favorite status */
   static updateFavoriteStatus(restaurantId, isFavorite) {
     fetch(`${DBHelper.DATABASE_URL}restaurants/${restaurantId}/?is_favorite=${isFavorite}`, {
