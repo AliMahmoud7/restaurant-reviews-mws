@@ -7,10 +7,10 @@ self.addEventListener('install', event => {
       return cache.addAll([
         'index.html',
         'restaurant.html',
-        'css/styles.css',
-        // 'dist/css/styles.bundle.min.css',
-        'js/dbhelper.js',
-        // 'dist/js/dbhelper.min.js',
+        // 'css/styles.css',
+        'dist/css/styles.bundle.min.css',
+        // 'js/dbhelper.js',
+        'dist/js/dbhelper.min.js',
         'js/main.js',
         'js/restaurant_info.js',
         'manifest.json'
