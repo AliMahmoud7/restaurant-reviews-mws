@@ -184,7 +184,7 @@ createRestaurantHTML = (restaurant) => {
   picture.append(image);
   li.append(picture);
 
-  const name = document.createElement('h1');
+  const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
   name.setAttribute('tabindex', '0');
   li.append(name);
@@ -192,6 +192,13 @@ createRestaurantHTML = (restaurant) => {
   const favBtn = document.createElement('button');
   favBtn.innerHTML = '❤';
   favBtn.classList.add("fav-btn");
+  if(restaurant.is_favorite) {
+    favBtn.classList.add('fav-active');
+    favBtn.setAttribute('aria-label', 'Remove as favorite');
+  } else {
+    favBtn.setAttribute('aria-label', 'Mark as favorite');
+  }
+
   favBtn.onclick = (e) => {
     // Toggle button favorite status
     const isFav = !restaurant.is_favorite;
@@ -205,8 +212,8 @@ createRestaurantHTML = (restaurant) => {
       favBtn.setAttribute('aria-label', 'Mark as favorite');
     }
 
-    // Update the server favorite status
-    // DBHelper.updateFavoriteStatus(restaurant.id, isFav);
+    // Update the server and indexedDB restaurant favorite status
+    DBHelper.updateFavoriteStatus(restaurant.id, isFav);
   };
   li.append(favBtn);
 

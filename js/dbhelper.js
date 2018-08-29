@@ -60,18 +60,33 @@ class DBHelper {
 
       let tx = db.transaction(store);
       let keyValStore = tx.objectStore(store);
-      try {
-        const id = parseInt(key);
-        return keyValStore.get(id);
-      } catch (error) {
-        return keyValStore.get(key);
-      }
+      return keyValStore.get(parseInt(key));
     }).then((val) => {
       if (val) {
         return Promise.resolve(val);
       } else {
         return Promise.reject("Can't find this key!");
       }
+    });
+  }
+
+  /**
+   * Read a value of a specific key from an indexedDB store
+   * @return (Promise) with an array includes the value, transaction and ObjectStore
+   */
+  static idbReadWrite(store, key) {
+    return DBHelper.openIndexedDB().then((db) => {
+      if (!db) return Promise.reject("Can't open indexedDB");
+
+      let tx = db.transaction(store, 'readwrite');
+      let keyValStore = tx.objectStore(store);
+      return keyValStore.get(parseInt(key)).then((val) => {
+        if (val) {
+          return Promise.resolve([val, tx, keyValStore]);
+        } else {
+          return Promise.reject("Can't find this key!");
+        }
+      });
     });
   }
 
@@ -107,7 +122,7 @@ class DBHelper {
       fetch(DBHelper.DATABASE_URL + 'restaurants').then((response) => {
         return response.json();
       }).then((restaurants) => {
-        DBHelper.idbAdd('restaurants', restaurants).then((restaurants) => {
+        DBHelper.idbAdd('restaurants', restaurants).then(() => {
           console.log('Data successfully added');
         }).catch(error => {
           console.log(error);
@@ -272,6 +287,28 @@ class DBHelper {
   static imageUrlForRestaurant(restaurant) {
     return (`/img/${restaurant.photograph}`);
   }
+
+  /** Update restaurant favorite status */
+  static updateFavoriteStatus(restaurantId, isFavorite) {
+    fetch(`${DBHelper.DATABASE_URL}restaurants/${restaurantId}/?is_favorite=${isFavorite}`, {
+      method: 'PUT'
+    }).then((response) => {
+      console.log('[Server] Favorite status changed');
+      DBHelper.idbReadWrite('restaurants', restaurantId).then((data) => {
+        const [restaurant, tx, restaurantStore] = data;
+        restaurant.is_favorite = isFavorite;
+        restaurantStore.put(restaurant);
+        return tx.complete;
+      }).then(() => {
+        console.log('[IndexedDB] Favorite status successfully changed');
+      }).catch(error => {
+        console.log(error);
+      });
+    }).catch((error) => {
+      console.log(error);
+    });
+  }
+
 
   /**
    * Map marker for a restaurant.
