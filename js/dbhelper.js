@@ -296,13 +296,13 @@ class DBHelper {
       return response.json();
     })
       .then((reviews) => {
-        DBHelper.idbAdd('reviews', reviews).then(() => {
+        DBHelper.idbAdd('reviews', reviews.reverse()).then(() => {
           console.log('Data successfully added');
         }).catch(error => {
           console.log(error);
         });
-        console.log('revs are: ', reviews);
-        return Promise.resolve(reviews);
+        console.log('reviews are:', reviews.reverse());
+        return Promise.resolve(reviews.reverse());
       })
       .catch((error) => {
         // No internet connection
@@ -314,13 +314,18 @@ class DBHelper {
           return reviewsIndex.getAll(parseInt(id));
         }).then((storedReviews) => {
           if (storedReviews) {
-            console.log('looking for offline stored reviews');
+            console.log('Offline stored reviews:', storedReviews);
             return Promise.resolve(storedReviews);
           } else {
             return Promise.reject("Can't find this key!");
           }
         });
       });
+  }
+
+  /** Send the new user review to the server */
+  static sendReview() {
+
   }
 
   /** Update restaurant favorite status */

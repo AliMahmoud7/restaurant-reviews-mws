@@ -117,7 +117,11 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  fillReviewsHTML();
+  // fillReviewsHTML();
+  DBHelper.fetchReviewsByRestaurantId(restaurant.id).then(reviews => {
+    fillReviewsHTML(reviews)
+  });
+
 };
 
 /**
@@ -180,7 +184,7 @@ createReviewHTML = (review) => {
   wrappingDiv.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  date.innerHTML = `${new Date(review.createdAt).toLocaleString()}`;
   date.className = 'review-date';
   wrappingDiv.appendChild(date);
 
@@ -195,6 +199,51 @@ createReviewHTML = (review) => {
 
   return li;
 };
+
+/**
+ * Add the the review to the UI and Submit it
+ */
+document.getElementById('submit-review-form').addEventListener('click', (e) => {
+  e.preventDefault(); // prevent the default action (submit)
+
+  // Getting the data from the review form
+  let restaurantId = parseInt(getParameterByName('id')); // Parsing URL parameters to get current id value
+  let name = document.getElementById('name').value;
+  let rating = document.getElementById('rating').value;
+  // let rating = document.querySelector('#rating option:checked').value;
+  let comments = document.getElementById('comments').value;
+  const review = [restaurantId, name, rating, comments];
+
+  // Adds the review to the DOM (UI)
+  const frontEndReview = {
+    restaurant_id: restaurantId,
+    name: name,
+    rating: rating,
+    comments: comments.substring(0, 300),
+    createdAt: new Date()
+  };
+  addNewReviewHTML(frontEndReview);
+
+  // Send review to the server
+  // DBHelper.sendReview(frontEndReview);
+
+  document.getElementById('review-form').reset();
+});
+
+addNewReviewHTML = (review) => {
+  const noReviewElem = document.getElementById('no-review');
+  if (noReviewElem) {
+    noReviewElem.remove();
+  }
+  const container = document.getElementById('reviews-container');
+  const ul = document.getElementById('reviews-list');
+
+  // Insert the new review on top of reviews
+  ul.insertBefore(createReviewHTML(review), ul.firstChild);
+  container.appendChild(ul);
+};
+
+
 
 /**
  * Add restaurant name to the breadcrumb navigation menu
