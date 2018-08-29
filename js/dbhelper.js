@@ -12,7 +12,11 @@ class DBHelper {
     return `http://localhost:${port}/`;
   }
 
-  /** IndexedDB */
+  /**
+   * IndexedDB HELPER FUNCTIONS
+   */
+  // ----------------------------------------------------------
+  /** Open IndexedDB */
   static openIndexedDB() {
     // If the browser doesn't support service worker, we don't care about having indexedDB
     if (!navigator.serviceWorker) {
@@ -35,7 +39,7 @@ class DBHelper {
     });
   }
 
-  /** Add new data to an indexedDB store*/
+  /* Add new data to an indexedDB store */
   static idbAdd(store, data) {
     return DBHelper.openIndexedDB().then((db) => {
       if (!db) return Promise.reject("Can't open indexedDB");
@@ -46,14 +50,14 @@ class DBHelper {
         keyValStore.put(data);
       }
       else {
-        // data.forEach((keyVal) => keyValStore.put(keyVal));
-        data.map((keyVal) => keyValStore.put(keyVal));
+        data.forEach((keyVal) => keyValStore.put(keyVal));
+        // data.map((keyVal) => keyValStore.put(keyVal));
       }
       return tx.complete;
     });
   }
 
-  /** Read a value of a specific key from an indexedDB store*/
+  /** Read a value of a specific key (Integer) from an indexedDB store */
   static idbRead(store, key) {
     return DBHelper.openIndexedDB().then((db) => {
       if (!db) return Promise.reject("Can't open indexedDB");
@@ -70,8 +74,25 @@ class DBHelper {
     });
   }
 
+  /** Read a value of a specific key (Integer) from an indexedDB index */
+  static idbReadAllByIndex(store, index, key) {
+    return DBHelper.openIndexedDB().then((db) => {
+      if (!db) return Promise.reject("Can't open indexedDB");
+
+      let keyValStore = db.transaction(store).objectStore(store);
+      let keyValIndex = keyValStore.index(index);
+      return keyValIndex.getAll(parseInt(key));
+    }).then((val) => {
+      if (val.length) {
+        return Promise.resolve(val);
+      } else {
+        return Promise.reject("Can't find this key!");
+      }
+    });
+  }
+
   /**
-   * Read a value of a specific key from an indexedDB store
+   * Read a value of a specific key (Integer) from an indexedDB store
    * @return (Promise) with an array includes the value, transaction and ObjectStore
    */
   static idbReadWrite(store, key) {
@@ -106,6 +127,7 @@ class DBHelper {
       }
     });
   }
+  // ----------------------------------------------------------
 
   /**
    * Fetch all restaurants.
@@ -289,46 +311,96 @@ class DBHelper {
   }
 
   /**
-   * Fetch all reviews.
+   * Fetch all reviews by restaurant id.
    */
   static fetchReviewsByRestaurantId(id) {
     return fetch(`${DBHelper.DATABASE_URL}reviews/?restaurant_id=${id}`).then((response) => {
       return response.json();
-    })
-      .then((reviews) => {
-        DBHelper.idbAdd('reviews', reviews.reverse()).then(() => {
-          console.log('Data successfully added');
-        }).catch(error => {
-          console.log(error);
-        });
-        console.log('reviews are:', reviews.reverse());
-        return Promise.resolve(reviews.reverse());
-      })
-      .catch((error) => {
-        // No internet connection
-        return DBHelper.openIndexedDB().then((db) => {
-          if (!db) return Promise.reject("Can't open indexedDB");
-
-          const reviewsStore = db.transaction('reviews').objectStore('reviews');
-          const reviewsIndex = reviewsStore.index('by-restaurant');
-          return reviewsIndex.getAll(parseInt(id));
-        }).then((storedReviews) => {
-          if (storedReviews) {
-            console.log('Offline stored reviews:', storedReviews);
-            return Promise.resolve(storedReviews);
-          } else {
-            return Promise.reject("Can't find this key!");
-          }
-        });
+    }).then((reviews) => {
+      reviews = reviews.reverse();
+      DBHelper.idbAdd('reviews', reviews).then(() => {
+        console.log('Data successfully added');
+      }).catch(error => {
+        console.log(error);
       });
+      console.log('Reviews are:', reviews);
+      return Promise.resolve(reviews);
+    }).catch((error) => {
+      console.log(error);
+      // console.log('Offline');
+      return DBHelper.idbReadAllByIndex('reviews', 'by-restaurant', id).then((storedReviews) => {
+        console.log('Offline stored reviews:', storedReviews);
+        return Promise.resolve(storedReviews);
+      }).catch((error) => {
+        console.log(error);
+      });
+    });
   }
 
-  /** Send the new user review to the server */
-  static sendReview() {
 
+  /**
+   * Send the new user review to the server
+   */
+  static sendNewReviewToServer(review) {
+    // delete review.createdAt;  // Delete the createAt property from review object
+
+    fetch(`http://localhost:1337/reviews`, {
+      method: 'POST',
+      body: JSON.stringify(review),
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      })
+    }).then((response) => {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.indexOf('application/json') !== -1) {
+        return response.json();
+      }
+    }).then((review) => {
+      console.log('Successfully sent review!', review);
+    }).catch((error) => {
+      console.log(error);
+    });
   }
 
-  /** Update restaurant favorite status */
+  /**
+   * Handle offline status (Defer offline review to send when get online)
+   */
+  static sendNewReviewsWhenOnline(reviews) {
+    console.log('Reviews to be sent when online: ', reviews);
+
+    // Store the reviews locally
+    localStorage.setItem('reviews', JSON.stringify(reviews));
+    // DBHelper.idbAdd('reviews', reviews).then(() => {
+    //   console.log('Data successfully added');
+    // }).catch(error => {
+    //   console.log(error);
+    // });
+
+    // Waiting for online status
+    window.addEventListener('online', (e) => {
+      console.log('Browser is online again!');
+      let storedReviews = JSON.parse(localStorage.getItem('reviews'));
+
+      // Update and clean the offline reviews UI
+      const offlineReviews = document.querySelectorAll(".offline-review");
+      offlineReviews.forEach(elem => {
+        elem.classList.remove("offline-review");
+        elem.querySelector(".offline-label").remove();
+      });
+
+      if (storedReviews !== null) {
+        console.log(storedReviews);
+        // Send each review to the server
+        storedReviews.reverse().forEach((review) => DBHelper.sendNewReviewToServer(review));
+        console.log('Data sent to the server');
+        localStorage.removeItem('reviews'); // remove the reviews locally
+      }
+    });
+  }
+
+  /**
+   * Update restaurant favorite status
+   */
   static updateFavoriteStatus(restaurantId, isFavorite) {
     fetch(`${DBHelper.DATABASE_URL}restaurants/${restaurantId}/?is_favorite=${isFavorite}`, {
       method: 'PUT'
@@ -378,10 +450,10 @@ class DBHelper {
 
 
 // Register service worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(reg => {
-    console.log('SW registration worked');
-  }).catch(err => {
-    console.log('Registration failed!!');
-  });
-}
+// if ('serviceWorker' in navigator) {
+//   navigator.serviceWorker.register('./sw.js').then(reg => {
+//     console.log('SW registration worked');
+//   }).catch(err => {
+//     console.log('Registration failed!!');
+//   });
+// }

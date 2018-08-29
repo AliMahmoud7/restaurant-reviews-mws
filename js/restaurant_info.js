@@ -117,7 +117,6 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  // fillReviewsHTML();
   DBHelper.fetchReviewsByRestaurantId(restaurant.id).then(reviews => {
     fillReviewsHTML(reviews)
   });
@@ -157,6 +156,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   if (!reviews) {
     const noReviews = document.createElement('p');
     noReviews.innerHTML = 'No reviews yet!';
+    noReviews.id = 'no-reviews';
     container.appendChild(noReviews);
     return;
   }
@@ -172,6 +172,14 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
  */
 createReviewHTML = (review) => {
   const li = document.createElement('li');
+
+  if (!navigator.onLine && offlineReviews.length) {
+    const offlineStatus = document.createElement('p');
+    offlineStatus.classList.add('offline-label');
+    offlineStatus.innerHTML = "Offline";
+    li.classList.add("offline-review");
+    li.appendChild(offlineStatus);
+  }
 
   const wrappingDiv = document.createElement('div');
   wrappingDiv.className = 'name-date-container';
@@ -203,42 +211,52 @@ createReviewHTML = (review) => {
 /**
  * Add the the review to the UI and Submit it
  */
-document.getElementById('submit-review-form').addEventListener('click', (e) => {
+const reviewForm = document.getElementById('review-form');
+let offlineReviews = [];
+
+reviewForm.addEventListener('submit', (e) => {
   e.preventDefault(); // prevent the default action (submit)
 
   // Getting the data from the review form
-  let restaurantId = parseInt(getParameterByName('id')); // Parsing URL parameters to get current id value
+  let restaurantId = getParameterByName('id'); // Parsing URL parameters to get current id value
   let name = document.getElementById('name').value;
   let rating = document.getElementById('rating').value;
-  // let rating = document.querySelector('#rating option:checked').value;
   let comments = document.getElementById('comments').value;
-  const review = [restaurantId, name, rating, comments];
 
   // Adds the review to the DOM (UI)
-  const frontEndReview = {
-    restaurant_id: restaurantId,
+  const reviewObj = {
+    restaurant_id: parseInt(restaurantId),
     name: name,
-    rating: rating,
+    rating: parseInt(rating),
     comments: comments.substring(0, 300),
     createdAt: new Date()
   };
-  addNewReviewHTML(frontEndReview);
+  console.log(reviewObj);
+  addNewReviewHTML(reviewObj);
 
   // Send review to the server
-  // DBHelper.sendReview(frontEndReview);
+  if (navigator.onLine) {  // Check if user is offline
+    DBHelper.sendNewReviewToServer(reviewObj);
+    offlineReviews = [];
+  }
+  else {
+    offlineReviews.push(reviewObj);
+    DBHelper.sendNewReviewsWhenOnline(offlineReviews);
+  }
 
-  document.getElementById('review-form').reset();
+  reviewForm.reset();
 });
 
 addNewReviewHTML = (review) => {
-  const noReviewElem = document.getElementById('no-review');
-  if (noReviewElem) {
-    noReviewElem.remove();
+  // Remove no reviews element if there
+  const noReviewsElem = document.getElementById('no-reviews');
+  if (noReviewsElem) {
+    noReviewsElem.remove();
   }
   const container = document.getElementById('reviews-container');
   const ul = document.getElementById('reviews-list');
 
-  // Insert the new review on top of reviews
+  // Add the new review on top of reviews
   ul.insertBefore(createReviewHTML(review), ul.firstChild);
   container.appendChild(ul);
 };
