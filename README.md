@@ -1,13 +1,13 @@
-# Mobile Web Specialist Certification Course
----
-#### _Three Stage Course Material Project - Restaurant Reviews_
+# Restaurant Reviews
+
+#### _Three Stage Project - For Mobile Web Specialist Certification Course_
 
 ## Project Overview: Stage 1
 
 - Worked on a static design that lacks accessibility and convert the design to be fully responsive on different sized displays and accessible for screen reader use.
 - Used cache API and a [ServiceWorker](https://developers.google.com/web/fundamentals/primers/service-workers/) to cache the data for the website so that any page (including images) that has been visited is accessible offline and to begin the process of creating a seamless offline experience for the users.
 
-#### Specification
+#### Specification:
 
 You have been provided the code for a restaurant reviews website. The code has a lot of issues. It’s barely usable on a desktop browser, much less a mobile device. It also doesn’t include any standard accessibility features, and it doesn’t work offline at all. Your job is to update the code to resolve these issues while still maintaining the included functionality. 
 
@@ -15,7 +15,7 @@ You have been provided the code for a restaurant reviews website. The code has a
 
 This repository uses [leafletjs](https://leafletjs.com/) with [Mapbox](https://www.mapbox.com/). You need to replace `<your MAPBOX API KEY HERE>` with a token from [Mapbox](https://www.mapbox.com/). Mapbox is free to use, and does not require any payment information. 
 
-#### Note about ES6
+#### Note about ES6:
 
 Most of the code in this project has been written to the ES6 JavaScript specification for compatibility with modern web browsers and future proofing JavaScript code. As much as possible, try to maintain use of ES6 in any additional JavaScript you write. 
 
@@ -27,11 +27,11 @@ Most of the code in this project has been written to the ES6 JavaScript specific
 - The site is optimized to meet performance benchmarks, which are tested using [Lighthouse](https://developers.google.com/web/tools/lighthouse/).
 
 
-#### Specification
+#### Specification:
 
 You will be provided code for a [Node development server](https://github.com/udacity/mws-restaurant-stage-2) and a README for getting the server up and running locally on your computer. The README will also contain the API you will need to make JSON requests to the server. Once you have the server up, you will begin the work of improving your Stage One project code. You will use the fetch() API to make requests to the server to populate the content of your Restaurant Reviews app.
 
-##### Local Development Server
+##### Local Development Server:
 
 I've used this [Local Development API Server](https://github.com/udacity/mws-restaurant-stage-2) for fetching and posting JSON data.
 
@@ -45,10 +45,10 @@ I've used this [Local Development API Server](https://github.com/udacity/mws-res
     - Progressive Web App score better than 90.
     - Accessibility score better than at 90.
 
-#### Specification
+#### Specification:
 You will be provided code for an updated [Node development server](ttps://github.com/udacity/mws-restaurant-stage-3) and a README for getting the server up and running locally on your computer. The README will also contain the API you will need to make JSON requests to the server. Once you have the server up, you will begin the work of improving your Stage Two project code.
 
-##### Local Development Server
+##### Local Development Server:
 
 I've used this [Local Development API Server](https://github.com/udacity/mws-restaurant-stage-3) for fetching and posting JSON data.
 
