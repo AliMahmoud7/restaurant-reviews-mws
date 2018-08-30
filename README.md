@@ -4,29 +4,48 @@
 
 ## Project Overview: Stage 1
 
-For the **Restaurant Reviews** projects, you will incrementally convert a static webpage to a mobile-ready web application. In **Stage One**, you will take a static design that lacks accessibility and convert the design to be responsive on different sized displays and accessible for screen reader use. You will also add a service worker to begin the process of creating a seamless offline experience for your users.
+- Worked on a static design that lacks accessibility and convert the design to be responsive on different sized displays and accessible for screen reader use.
+- Added a [Service Worker](https://developers.google.com/web/fundamentals/primers/service-workers/) to begin the process of creating a seamless offline experience for your users.
 
-### Specification
+#### Specification
 
 You have been provided the code for a restaurant reviews website. The code has a lot of issues. It’s barely usable on a desktop browser, much less a mobile device. It also doesn’t include any standard accessibility features, and it doesn’t work offline at all. Your job is to update the code to resolve these issues while still maintaining the included functionality. 
 
-### What do I do from here?
-
-1. In this folder, start up a simple HTTP server to serve up the site files on your local computer. Python has some simple tools to do this, and you don't even need to know Python. For most people, it's already installed on your computer. 
-
-In a terminal, check the version of Python you have: `python -V`. If you have Python 2.x, spin up the server with `python -m SimpleHTTPServer 8000` (or some other port, if port 8000 is already in use.) For Python 3.x, you can use `python3 -m http.server 8000`. If you don't have Python installed, navigate to Python's [website](https://www.python.org/) to download and install the software.
-
-2. With your server running, visit the site: `http://localhost:8000`, and look around for a bit to see what the current experience looks like.
-3. Explore the provided code, and start making a plan to implement the required features in three areas: responsive design, accessibility and offline use.
-4. Write code to implement the updates to get this site on its way to being a mobile-ready website.
-
-## Leaflet.js and Mapbox:
+#### Leaflet.js and Mapbox:
 
 This repository uses [leafletjs](https://leafletjs.com/) with [Mapbox](https://www.mapbox.com/). You need to replace `<your MAPBOX API KEY HERE>` with a token from [Mapbox](https://www.mapbox.com/). Mapbox is free to use, and does not require any payment information. 
 
-### Note about ES6
+#### Note about ES6
 
 Most of the code in this project has been written to the ES6 JavaScript specification for compatibility with modern web browsers and future proofing JavaScript code. As much as possible, try to maintain use of ES6 in any additional JavaScript you write. 
 
 
+## Project Overview: Stage 2
 
+- Used asynchronous JavaScript to request data from the backend server instead of parsing a local JSON file.
+- Stored site content in an offline database using [IndexedDB](https://developers.google.com/web/ilt/pwa/working-with-indexeddb/), which will create an app shell architecture.
+- The site is optimized to meet performance benchmarks, which are tested using [Lighthouse](https://developers.google.com/web/tools/lighthouse/).
+
+#### Local Development Server
+
+I've used this [Local Development API Server](https://github.com/udacity/mws-restaurant-stage-2) for fetching and posting JSON data.
+
+## Project Overview: Stage 3
+
+- Added a validated form submission that allows user to add a review for a restaurant even if there is a lack of connectivity (user is offline), It takes the user submission and store it until the connection restablishes to send back a POST request to the backend server.
+- Added a favorite button that sends a PUT request to the backend server to update the favorite status of a restaurant, which works offline as well.
+- The site is optimized to meet performance benchmarks, which are tested using [Lighthouse](https://developers.google.com/web/tools/lighthouse/).
+
+#### Local Development Server
+
+I've used this [Local Development API Server](https://github.com/udacity/mws-restaurant-stage-3) for fetching and posting JSON data.
+
+
+## Getting Started
+
+1. Download and install [Node.js](https://nodejs.org/en/download/).
+2. Install dependencies `npm install`.
+3. Download and run the [local development API server]((https://github.com/udacity/mws-restaurant-stage-3)).
+4. Download and install [Python](https://www.python.org/).
+5. Start up a simple HTTP server `python3 -m http.server 8000`. 
+6. Visit [http://localhost:8000](http://localhost:8000)
