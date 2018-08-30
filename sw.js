@@ -5,6 +5,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(assetsCacheName).then(cache => {
       return cache.addAll([
+        '/',
         'index.html',
         'restaurant.html',
         // 'css/styles.css',
@@ -13,6 +14,7 @@ self.addEventListener('install', event => {
         'dist/js/dbhelper.min.js',
         'js/main.js',
         'js/restaurant_info.js',
+        'js/idb.js',
         'manifest.json'
       ]).catch(err => {
         console.log(`Cache failed! ${err}`);
@@ -47,7 +49,7 @@ self.addEventListener('fetch', event => {
   if (requestUrl.origin !== location.origin && requestUrl.origin !== 'https://unpkg.com') return;
 
   event.respondWith(
-    caches.match(requestUrl).then(response => {
+    caches.match(requestUrl, { ignoreSearch: true }).then(response => {
       if (response) return response;
 
       return fetch(event.request).then(networkResponse => {

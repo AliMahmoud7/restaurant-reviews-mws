@@ -463,7 +463,7 @@ class DBHelper {
 
 // Register service worker
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(reg => {
+  navigator.serviceWorker.register('sw.js').then(reg => {
     console.log('SW registration worked');
   }).catch(err => {
     console.log('Registration failed!!');
