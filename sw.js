@@ -39,15 +39,21 @@ self.addEventListener('activate', event => {
 
 /** Intercept requests to return from our cache if there */
 self.addEventListener('fetch', event => {
-  // const requestUrl = new URL(event.request.url);
-  const requestUrl = event.request.url;
+  const requestUrl = new URL(event.request.url);
+  // console.log(requestUrl);
+  // console.log(event.request);
+
+  if (event.request.method !== 'GET') return;
+  if (requestUrl.origin !== location.origin && requestUrl.origin !== 'https://unpkg.com') return;
 
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response ||
-        fetch(event.request).then(networkResponse => {
-          if (!networkResponse || networkResponse.status !== 200 )
+    caches.match(requestUrl).then(response => {
+      if (response) return response;
+
+      return fetch(event.request).then(networkResponse => {
+          if (!networkResponse || networkResponse.status !== 200 ) {
             return networkResponse;
+          }
 
           return caches.open(assetsCacheName).then(cache => {
             cache.put(requestUrl, networkResponse.clone());

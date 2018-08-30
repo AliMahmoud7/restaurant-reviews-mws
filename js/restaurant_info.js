@@ -118,7 +118,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   }
   // fill reviews
   DBHelper.fetchReviewsByRestaurantId(restaurant.id).then(reviews => {
-    fillReviewsHTML(reviews)
+    fillReviewsHTML(reviews.reverse());
   });
 
 };
@@ -215,7 +215,7 @@ const reviewForm = document.getElementById('review-form');
 let offlineReviews = [];
 
 reviewForm.addEventListener('submit', (e) => {
-  e.preventDefault(); // prevent the default action (submit)
+  e.preventDefault(); // Prevent the default action (submit)
 
   // Getting the data from the review form
   let restaurantId = getParameterByName('id'); // Parsing URL parameters to get current id value
@@ -223,7 +223,7 @@ reviewForm.addEventListener('submit', (e) => {
   let rating = document.getElementById('rating').value;
   let comments = document.getElementById('comments').value;
 
-  // Adds the review to the DOM (UI)
+
   const reviewObj = {
     restaurant_id: parseInt(restaurantId),
     name: name,
@@ -232,17 +232,19 @@ reviewForm.addEventListener('submit', (e) => {
     createdAt: new Date()
   };
   console.log(reviewObj);
-  addNewReviewHTML(reviewObj);
 
   // Send review to the server
-  if (navigator.onLine) {  // Check if user is offline
+  if (!navigator.onLine) {  // Check if user is offline
+    offlineReviews.push(reviewObj);
+    DBHelper.sendNewReviewWhenOnline(reviewObj);
+  }
+  else {
     DBHelper.sendNewReviewToServer(reviewObj);
     offlineReviews = [];
   }
-  else {
-    offlineReviews.push(reviewObj);
-    DBHelper.sendNewReviewsWhenOnline(offlineReviews);
-  }
+
+  // Adds the review to the DOM (UI)
+  addNewReviewHTML(reviewObj);
 
   reviewForm.reset();
 });

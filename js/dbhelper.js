@@ -314,29 +314,29 @@ class DBHelper {
    * Fetch all reviews by restaurant id.
    */
   static fetchReviewsByRestaurantId(id) {
-    return fetch(`${DBHelper.DATABASE_URL}reviews/?restaurant_id=${id}`).then((response) => {
-      return response.json();
-    }).then((reviews) => {
-      reviews = reviews.reverse();
-      DBHelper.idbAdd('reviews', reviews).then(() => {
-        console.log('Data successfully added');
-      }).catch(error => {
-        console.log(error);
-      });
-      console.log('Reviews are:', reviews);
-      return Promise.resolve(reviews);
+    // Get data from indexedDB if existed
+    return DBHelper.idbReadAllByIndex('reviews', 'by-restaurant', id).then((storedReviews) => {
+      console.log('Offline stored reviews:', storedReviews);
+      return Promise.resolve(storedReviews);
     }).catch((error) => {
       console.log(error);
-      // console.log('Offline');
-      return DBHelper.idbReadAllByIndex('reviews', 'by-restaurant', id).then((storedReviews) => {
-        console.log('Offline stored reviews:', storedReviews);
-        return Promise.resolve(storedReviews);
+
+      // Get data from the network if not existed in indexedDB and Update it
+      return fetch(`${DBHelper.DATABASE_URL}reviews/?restaurant_id=${id}`).then((response) => {
+        return response.json();
+      }).then((reviews) => {
+        DBHelper.idbAdd('reviews', reviews).then(() => {
+          console.log('Data successfully added');
+        }).catch(error => {
+          console.log(error);
+        });
+        console.log('Reviews are:', reviews);
+        return Promise.resolve(reviews);
       }).catch((error) => {
         console.log(error);
       });
     });
   }
-
 
   /**
    * Send the new user review to the server
@@ -356,7 +356,16 @@ class DBHelper {
         return response.json();
       }
     }).then((review) => {
-      console.log('Successfully sent review!', review);
+      if (review) {
+        console.log('Successfully sent review!', review);
+
+        // Add the review to the indexedDB
+        DBHelper.idbAdd('reviews', review).then(() => {
+          console.log('Data successfully added');
+        }).catch(error => {
+          console.log(error);
+        });
+      }
     }).catch((error) => {
       console.log(error);
     });
@@ -365,21 +374,16 @@ class DBHelper {
   /**
    * Handle offline status (Defer offline review to send when get online)
    */
-  static sendNewReviewsWhenOnline(reviews) {
-    console.log('Reviews to be sent when online: ', reviews);
+  static sendNewReviewWhenOnline(review) {
+    console.log('Review to be sent when online: ', review);
 
     // Store the reviews locally
-    localStorage.setItem('reviews', JSON.stringify(reviews));
-    // DBHelper.idbAdd('reviews', reviews).then(() => {
-    //   console.log('Data successfully added');
-    // }).catch(error => {
-    //   console.log(error);
-    // });
+    // localStorage.setItem('reviews', JSON.stringify(reviews));
 
     // Waiting for online status
     window.addEventListener('online', (e) => {
       console.log('Browser is online again!');
-      let storedReviews = JSON.parse(localStorage.getItem('reviews'));
+      // let storedReviews = JSON.parse(localStorage.getItem('reviews'));
 
       // Update and clean the offline reviews UI
       const offlineReviews = document.querySelectorAll(".offline-review");
@@ -388,13 +392,21 @@ class DBHelper {
         elem.querySelector(".offline-label").remove();
       });
 
-      if (storedReviews !== null) {
-        console.log(storedReviews);
-        // Send each review to the server
-        storedReviews.reverse().forEach((review) => DBHelper.sendNewReviewToServer(review));
-        console.log('Data sent to the server');
-        localStorage.removeItem('reviews'); // remove the reviews locally
-      }
+      // Send the review to the server
+      console.log(review);
+      DBHelper.sendNewReviewToServer(review);
+
+      // if (storedReviews !== null) {
+      //   console.log(storedReviews);
+      //   console.log(typeof storedReviews);
+      //   storedReviews = storedReviews.reverse();
+      //
+      //   // Send each review to the server
+      //   storedReviews.forEach((review) => DBHelper.sendNewReviewToServer(review));
+      //   console.log('Reviews sent to the server');
+      //
+      //   localStorage.removeItem('reviews'); // remove the reviews locally
+      // }
     });
   }
 
