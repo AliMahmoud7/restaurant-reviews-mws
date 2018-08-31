@@ -43,7 +43,7 @@ I've used this [Local Development API Server](https://github.com/udacity/mws-res
 - The site is optimized to meet performance benchmarks, which are tested using [Lighthouse](https://developers.google.com/web/tools/lighthouse/).
     - Performance score better than 90.
     - Progressive Web App score better than 90.
-    - Accessibility score better than at 90.
+    - Accessibility score better than 90.
 
 #### Specification:
 You will be provided code for an updated [Node development server](ttps://github.com/udacity/mws-restaurant-stage-3) and a README for getting the server up and running locally on your computer. The README will also contain the API you will need to make JSON requests to the server. Once you have the server up, you will begin the work of improving your Stage Two project code.
